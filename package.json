@@ -1,0 +1,33 @@
+{
+  "name": "payment-box-ai",
+  "version": "1.0.0",
+  "description": "Verified Action Sandboxes for trusted AI-assisted shopping",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest",
+    "lint": "eslint src/"
+  },
+  "keywords": [
+    "ai",
+    "payment",
+    "sandbox",
+    "verification",
+    "biometric",
+    "trust"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "puppeteer": "^21.6.1",
+    "uuid": "^9.0.1",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0",
+    "eslint": "^8.55.0"
+  }
+}
