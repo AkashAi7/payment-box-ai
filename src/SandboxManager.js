@@ -26,7 +26,6 @@ class SandboxManager {
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-blink-features=AutomationControlled',
-        '--disable-web-security', // For demo purposes - remove in production
       ],
     });
 

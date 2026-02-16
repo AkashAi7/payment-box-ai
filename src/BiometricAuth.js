@@ -25,8 +25,8 @@ class BiometricAuth {
       
       // Check for specific authenticator types
       try {
-        const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-        if (available) {
+        const isAvailable = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+        if (isAvailable) {
           available.fingerprint = true;
           available.faceId = true;
         }

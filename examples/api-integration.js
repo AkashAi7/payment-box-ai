@@ -5,7 +5,8 @@
  * with your existing application using the REST API.
  */
 
-const fetch = require('node-fetch');
+// Use built-in fetch (Node.js 18+) or require node-fetch
+const fetch = globalThis.fetch || require('node-fetch');
 
 const API_BASE = 'http://localhost:3000/api';
 
