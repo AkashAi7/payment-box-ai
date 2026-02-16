@@ -6,10 +6,54 @@ const BiometricAuth = require('./BiometricAuth');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Rate limiting configuration
+const requestCounts = new Map();
+const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
+const RATE_LIMIT_MAX = 100; // max requests per window
+
+// Simple rate limiting middleware
+function rateLimit(req, res, next) {
+  const ip = req.ip || req.connection.remoteAddress;
+  const now = Date.now();
+  
+  if (!requestCounts.has(ip)) {
+    requestCounts.set(ip, []);
+  }
+  
+  const requests = requestCounts.get(ip);
+  // Remove old requests outside the window
+  const recentRequests = requests.filter(time => now - time < RATE_LIMIT_WINDOW);
+  
+  if (recentRequests.length >= RATE_LIMIT_MAX) {
+    return res.status(429).json({
+      error: 'Too many requests',
+      message: 'Rate limit exceeded. Please try again later.',
+    });
+  }
+  
+  recentRequests.push(now);
+  requestCounts.set(ip, recentRequests);
+  next();
+}
+
+// Clean up old rate limit data periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, requests] of requestCounts.entries()) {
+    const recentRequests = requests.filter(time => now - time < RATE_LIMIT_WINDOW);
+    if (recentRequests.length === 0) {
+      requestCounts.delete(ip);
+    } else {
+      requestCounts.set(ip, recentRequests);
+    }
+  }
+}, 60000); // Clean every minute
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+app.use('/api', rateLimit); // Apply rate limiting to all API routes
 
 // Initialize managers
 const sandboxManager = new SandboxManager();
@@ -112,6 +156,8 @@ app.post('/api/auth/challenge', (req, res) => {
 });
 
 // Verify authentication and execute action
+// Note: Rate limiting is applied via app.use('/api', rateLimit) middleware above
+// All /api routes including this one are protected by rate limiting
 app.post('/api/sandbox/:sandboxId/execute', async (req, res) => {
   try {
     const { sandboxId } = req.params;
